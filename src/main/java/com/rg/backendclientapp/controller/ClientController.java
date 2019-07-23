@@ -1,5 +1,6 @@
 package com.rg.backendclientapp.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,30 +71,66 @@ public class ClientController {
     	Clients newClient=null;
     	Map<String, Object> response = new HashMap<>();
     	
+    	
+    	if(bindinResul.hasErrors()) {
+    		List<String> errors=new ArrayList<>();
+    		for(FieldError err:bindinResul.getFieldErrors()) {
+    			errors.add(err.getDefaultMessage());
+    		}
+    		
+    		response.put("error",errors);
+			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.BAD_REQUEST);
+    	}
+    	
+    	
     	 try {
 			newClient=clientService.EnregistreClient(client);
 		} catch (DataAccessException e) {
 			
 			response.put("message","Une erreur c'est produit lors de l'enregistrement");
-			response.put("error",e.getMessage().concat(" :").concat(e.getMostSpecificCause().getMessage()));
+			response.put("error",e.getMessage());
 			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		  response.put("Message ", "le client est enregistre");
+		  response.put("message ", "le client à été enregistré");
 		  response.put("client", newClient);
 		return new ResponseEntity<Map<String, Object>>(response,HttpStatus.CREATED) ;
     	
     }
     
     @PutMapping("/updateClient/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Clients updateClient(@RequestBody  Clients client,@PathVariable Long id) {
+    public ResponseEntity<?> updateClient(@RequestBody(required = true) @Valid Clients client,BindingResult bindinResul,@PathVariable Long id) {
 		logger.info("An INFO Message "+id);
-    	Clients clientActuel=clientService.DetailClient(id);
-    	clientActuel.setName(client.getName());
-    	clientActuel.setEmail(client.getEmail());
-    	clientActuel.setTelephone(client.getTelephone());
-    	clientActuel.setUsername(client.getUsername());
-    	return clientService.EnregistreClient(clientActuel);
+		Clients clientActuel;
+		Map<String, Object> response = new HashMap<>();
+		
+		if(bindinResul.hasErrors()) {
+    		List<String> errors=new ArrayList<>();
+    		for(FieldError err:bindinResul.getFieldErrors()) {
+    			errors.add(err.getDefaultMessage());
+    		}
+    		
+    		response.put("error",errors);
+			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.BAD_REQUEST);
+    	}
+    	
+		
+		try {
+			clientActuel=clientService.DetailClient(id);
+		   	clientActuel.setName(client.getName());
+	    	clientActuel.setEmail(client.getEmail());
+	    	clientActuel.setTelephone(client.getTelephone());
+	    	clientActuel.setUsername(client.getUsername());
+	    	clientService.EnregistreClient(clientActuel);
+		} catch (DataAccessException e) {
+			response.put("message","Une erreur de de modification");
+			response.put("error",e.getMessage().concat(" :").concat(e.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+ 
+		response.put("Message ", "Le client a été modifie");
+		  response.put("client", clientActuel);
+		return new ResponseEntity<Map<String, Object>>(response,HttpStatus.CREATED) ;
     }
     
     @GetMapping("/deleteClient/{id}")

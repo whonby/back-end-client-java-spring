@@ -28,14 +28,16 @@ public class Clients implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty
+	@Size(min=4,max=100)
 	@Column(nullable = false)
 	private String name;
-	
 	
 	@NotEmpty
 	@Size(min=2,max=10)
 	private String username;
 	
+	@NotEmpty
 	@Email
 	@Column(nullable = false,unique= true)
 	private String email;
