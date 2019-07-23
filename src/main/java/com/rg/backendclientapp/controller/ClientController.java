@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -71,12 +72,16 @@ public class ClientController {
     	Clients newClient=null;
     	Map<String, Object> response = new HashMap<>();
     	
-    	
     	if(bindinResul.hasErrors()) {
-    		List<String> errors=new ArrayList<>();
+    		/*List<String> errors=new ArrayList<>();
     		for(FieldError err:bindinResul.getFieldErrors()) {
     			errors.add(err.getDefaultMessage());
-    		}
+    		}*/
+    		//recuperation de erreur genere grace au model
+    		List<String> errors =bindinResul.getFieldErrors()
+    				.stream()
+    				.map(err -> err.getDefaultMessage())
+    				.collect(Collectors.toList());
     		
     		response.put("error",errors);
 			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.BAD_REQUEST);
@@ -104,11 +109,14 @@ public class ClientController {
 		Map<String, Object> response = new HashMap<>();
 		
 		if(bindinResul.hasErrors()) {
-    		List<String> errors=new ArrayList<>();
+    		/*List<String> errors=new ArrayList<>();
     		for(FieldError err:bindinResul.getFieldErrors()) {
     			errors.add(err.getDefaultMessage());
-    		}
-    		
+    		}*/
+			List<String> errors =bindinResul.getFieldErrors()
+    				.stream()
+    				.map(err -> err.getDefaultMessage())
+    				.collect(Collectors.toList());
     		response.put("error",errors);
 			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.BAD_REQUEST);
     	}

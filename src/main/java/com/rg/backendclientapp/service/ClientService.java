@@ -24,17 +24,6 @@ public class ClientService implements IClient{
 		return clientListe;
 	}
 
-	/*@Override
-	public void add(String name, String email, String telephone, String username, Date creat) {
-		Clients clients=new Clients();
-		clients.setName(name);
-		clients.setEmail(email);
-		clients.setTelephone(telephone);
-		clients.setUsername(username);
-		clients.setCreatedAt(creat);
-		clientRepository.save(clients);
-		
-	}*/
 
 	@Override
 	@Transactional
