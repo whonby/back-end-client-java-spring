@@ -33,7 +33,7 @@ public class Clients implements Serializable {
 	
 	
 	@NotEmpty
-	@Size(min=2,max=5)
+	@Size(min=2,max=10)
 	private String username;
 	
 	@Email

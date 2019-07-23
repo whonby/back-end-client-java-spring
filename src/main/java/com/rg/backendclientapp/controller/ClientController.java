@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,8 @@ import com.rg.backendclientapp.service.ClientService;
 @RestController
 @RequestMapping("/api")
 public class ClientController {
+
+	Logger logger = LoggerFactory.getLogger(ClientController.class);
     @Autowired
     ClientService clientService;
     
@@ -82,13 +86,12 @@ public class ClientController {
     @PutMapping("/updateClient/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public Clients updateClient(@RequestBody  Clients client,@PathVariable Long id) {
-  
+		logger.info("An INFO Message "+id);
     	Clients clientActuel=clientService.DetailClient(id);
     	clientActuel.setName(client.getName());
     	clientActuel.setEmail(client.getEmail());
     	clientActuel.setTelephone(client.getTelephone());
-    	clientActuel.setUsername(client.getTelephone());
-    	
+    	clientActuel.setUsername(client.getUsername());
     	return clientService.EnregistreClient(clientActuel);
     }
     
