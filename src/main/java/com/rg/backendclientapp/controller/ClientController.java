@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -44,6 +47,12 @@ public class ClientController {
     public List<Clients> index(){
     	//List<Clients> liste = clientService.allClient();
     	return clientService.allClient();
+    }
+    
+    @GetMapping("/listeClient/page/{page}")
+    public Page<Clients> index(@PathVariable Integer page){
+    	Pageable pageable= PageRequest.of(page, 5);
+    	return clientService.allClient(pageable);
     }
     
     @GetMapping("/detaiclient/{id}")
@@ -83,7 +92,7 @@ public class ClientController {
     				.map(err -> err.getDefaultMessage())
     				.collect(Collectors.toList());
     		
-    		response.put("error",errors);
+    		response.put("errors",errors);
 			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.BAD_REQUEST);
     	}
     	
@@ -109,15 +118,11 @@ public class ClientController {
 		Map<String, Object> response = new HashMap<>();
 		
 		if(bindinResul.hasErrors()) {
-    		/*List<String> errors=new ArrayList<>();
-    		for(FieldError err:bindinResul.getFieldErrors()) {
-    			errors.add(err.getDefaultMessage());
-    		}*/
 			List<String> errors =bindinResul.getFieldErrors()
     				.stream()
     				.map(err -> err.getDefaultMessage())
     				.collect(Collectors.toList());
-    		response.put("error",errors);
+    		response.put("errors",errors);
 			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.BAD_REQUEST);
     	}
     	
